@@ -1,0 +1,1 @@
+This is an object-oriented version of a Rock Paper Scissors game coded in Ruby.
