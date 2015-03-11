@@ -2,8 +2,9 @@ class Move
   include Comparable
   
   attr_reader :value
+  CHOICES = {'r' => 'Rock', 'p' => 'Paper', 's' => 'Scissors'}
 
-  def initialize(v)
+  def initialize(v = CHOICES.keys.sample)
     @value = v
   end
   
@@ -19,22 +20,21 @@ class Move
   end
 end
 
-class Player
+class Computer
   attr_accessor :hand
-  CHOICES = {'r' => 'Rock', 'p' => 'Paper', 's' => 'Scissors'}
-
+  
   def pick_hand
-    self.hand = Move.new(CHOICES.keys.sample)
+    self.hand = Move.new
   end
 end
 
-class Human < Player
- 
+class Player
+  attr_accessor :hand
   attr_reader :name
  
-  def initialize(name)
+  def initialize
     puts "Please enter your name:"
-    @name = name
+    @name = gets.chomp
   end
   
 
@@ -43,22 +43,22 @@ class Human < Player
       puts "Enter you move(r,p,s)"
       input = gets.chomp.downcase
       self.hand = Move.new(input)
-    end until CHOICES.keys.include?(input)
+    end until Move::CHOICES.keys.include?(input)
   end
 end
 
 
 class RockPaperScissors
-  attr_reader :human, :computer
+  attr_reader :player, :computer
   
-  def initialize(human,computer)
-    @human = human
-    @computer = computer
+  def initialize
+    @player = Player.new
+    @computer = Computer.new
   end
   
   def play
     puts "Welcome to this game of Rock,Paper,Scissors!\n"
-    human.pick_hand
+    player.pick_hand
     computer.pick_hand
     compare_hands
   end
@@ -66,7 +66,7 @@ class RockPaperScissors
   def play_again?
     puts "Would you like to play again?"   
     answer = gets.chomp.downcase
-    answer == 'yes' || answer == 'yea' || answer == 'y' ? true : false
+    ['yes','yea','y'].include?(answer) 
   end
 
   def game_results(winning_choice)
@@ -80,34 +80,30 @@ class RockPaperScissors
   end
 
   def display_hands
-    player_move = Player::CHOICES[human.hand.value]
-    computer_move = Player::CHOICES[computer.hand.value]
-    print "#{human.name} chose #{player_move} " 
-    print "and the Computer chose #{computer_move}\n"
+    player_move = Move::CHOICES[player.hand.value]
+    computer_move = Move::CHOICES[computer.hand.value]
+    print "#{player.name} chose #{player_move} " 
+    print "and the Computer chose #{computer_move}.\n"
   end
 
   def compare_hands
     display_hands
-    if human.hand == computer.hand
-      puts "The game is a tie"
-    elsif human.hand < computer.hand
+    if player.hand == computer.hand
+      puts "The game is a tie."
+    elsif player.hand < computer.hand
       game_results(computer.hand.value)
-      puts "The Computer Wins"
+      puts "The Computer Wins."
     else
-      game_results(human.hand.value)
-      puts "#{human.name} wins!"
+      game_results(player.hand.value)
+      puts "#{player.name} wins!"
     end
   end
 end
 
-
-computer = Player.new
-puts "Please enter your name."
-human = Human.new(gets.chomp)
-game = RockPaperScissors.new(human, computer)
+game = RockPaperScissors.new
 
 begin
-game.play
+  game.play
 end while game.play_again?
-puts "Thanks For Playing"
+puts "Thanks For Playing."
 
